@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1B4D3E">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HOI">
+<title>HOI · Command</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --pearl:    #F8F4EE;
+  --ivory:    #F2EBE0;
+  --linen:    #EDE3D4;
+  --stone:    #D8CFBF;
+  --em:       #1B4D3E;
+  --em2:      #2A6855;
+  --em3:      #3D8B6E;
+  --em4:      #C8DDD8;
+  --em5:      #E4F0ED;
+  --bg:       #6B2035;
+  --bg2:      #8B2A45;
+  --bg3:      #F5D5DE;
+  --ch:       #B8924A;
+  --ch2:      #D4AA62;
+  --ch3:      #F5E8C0;
+  --esp:      #1E1812;
+  --wal:      #3D2E22;
+  --moc:      #6E5A48;
+  --tau:      #9E8E7E;
+  --wh:       #FFFFFF;
+  --nav-h:    64px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--em);
+  color: var(--esp);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SHELL ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--pearl);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── STATUS BAR SPACER ── */
+.status-bar {
+  height: var(--safe-top);
+  background: var(--em);
+  flex-shrink: 0;
+}
+
+/* ── TOP HEADER ── */
+.header {
+  background: var(--em);
+  padding: 14px 20px 16px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ch), var(--ch2), var(--ch));
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.brand-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--ch2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px; font-weight: 600;
+  color: var(--em);
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,.2);
+}
+.brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--wh);
+  letter-spacing: .01em;
+}
+.brand-sub {
+  font-size: 10px; color: var(--ch3);
+  letter-spacing: .04em;
+}
+.header-right {
+  display: flex; align-items: center; gap: 10px;
+}
+.ai-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 10px; font-weight: 600;
+  color: var(--ch3);
+  letter-spacing: .04em;
+}
+.ai-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #5CDB95;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:.4; transform:scale(.6); }
+}
+.notif-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; cursor: pointer;
+  color: var(--wh);
+  flex-shrink: 0;
+}
+
+/* ── SCROLL CONTENT ── */
+.scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--nav-h) + var(--safe-bot) + 8px);
+}
+.scroll-content::-webkit-scrollbar { display: none; }
+
+/* ── PAGES ── */
+.page { display: none; animation: slideUp .28s cubic-bezier(.4,0,.2,1); }
+.page.active { display: block; }
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── HOME GREETING ── */
+.greeting-band {
+  background: var(--em);
+  padding: 18px 20px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.greeting-band::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.greeting-band::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; right: 20px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(212,170,98,.08);
+}
+.greeting-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 400;
+  color: var(--wh);
+  line-height: 1.2;
+}
+.greeting-text em { color: var(--ch2); font-style: italic; }
+.greeting-sub {
+  font-size: 12px; color: var(--ch3);
+  margin-top: 6px; opacity: .8;
+}
+.greeting-strip {
+  display: flex; gap: 10px;
+  margin-top: 18px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.greeting-strip::-webkit-scrollbar { display: none; }
+.g-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 11px; font-weight: 500;
+  color: var(--wh);
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.g-chip:active { background: rgba(255,255,255,.2); }
+
+/* ── SECTION ── */
+.section { padding: 20px 16px 0; }
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; font-weight: 600;
+  color: var(--esp);
+}
+.section-link {
+  font-size: 11px; font-weight: 600;
+  color: var(--em); cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--em5);
+}
+
+/* ── STAT CARDS ROW ── */
+.stats-scroll {
+  display: flex; gap: 10px;
+  overflow-x: auto;
+  padding: 0 16px 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.stats-scroll::-webkit-scrollbar { display: none; }
+.stat-card {
+  min-width: 130px;
+  background: var(--wh);
+  border-radius: 14px;
+  padding: 16px 16px 14px;
+  border: 1px solid var(--linen);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(30,24,18,.06);
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+}
+.stat-card.em::before  { background: var(--em); }
+.stat-card.bg::before  { background: var(--bg); }
+.stat-card.ch::before  { background: var(--ch); }
+.stat-card.tau::before { background: var(--tau); }
+.stat-icon { font-size: 22px; margin-bottom: 8px; opacity: .7; }
+.stat-label {
+  font-size: 9px; font-weight: 700;
+  color: var(--tau); letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.stat-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px; font-weight: 600;
+  color: var(--esp);
+  line-height: 1.0;
+  margin: 3px 0;
+}
+.stat-change { font-size: 10px; color: var(--em3); font-weight: 500; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--wh);
+  border-radius: 16px;
+  border: 1px solid var(--linen);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(30,24,18,.06);
+  margin-bottom: 12px;
+}
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--ivory);
+}
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-weight: 600;
+  color: var(--esp);
+}
+.card-sub { font-size: 10px; color: var(--tau); margin-top: 1px; }
+.card-body { padding: 16px 18px; }
+.card-more {
+  font-size: 11px; font-weight: 600;
+  color: var(--em); padding: 5px 11px;
+  border-radius: 20px; background: var(--em5);
+  cursor: pointer; white-space: nowrap;
+}
+
+/* ── AI CHAT ── */
+.chat-wrap {
+  display: flex; flex-direction: column;
+  height: 300px;
+}
+.chat-msgs {
+  flex: 1; overflow-y: auto;
+  padding: 4px 0;
+  display: flex; flex-direction: column; gap: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.chat-msgs::-webkit-scrollbar { display: none; }
+.msg { display: flex; gap: 8px; align-items: flex-start; }
+.msg.user { flex-direction: row-reverse; }
+.msg-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+.msg.ai   .msg-av { background: var(--em); color: var(--ch3); }
+.msg.user .msg-av { background: var(--ch); color: var(--esp); }
+.msg-bub {
+  max-width: 78%; padding: 10px 13px;
+  border-radius: 14px; font-size: 13px; line-height: 1.5;
+}
+.msg.ai   .msg-bub { background: var(--ivory); color: var(--wal); border-radius: 4px 14px 14px 14px; }
+.msg.user .msg-bub { background: var(--em); color: var(--ch3); border-radius: 14px 4px 14px 14px; }
+.msg-time { font-size: 9px; color: var(--tau); margin-top: 2px; padding: 0 2px; }
+
+.chat-input-row {
+  display: flex; gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ivory);
+  margin-top: 8px;
+}
+.chat-in {
+  flex: 1; padding: 11px 14px;
+  border: 1.5px solid var(--linen);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: var(--esp);
+  background: var(--ivory);
+  outline: none;
+}
+.chat-in:focus { border-color: var(--em); background: var(--wh); }
+.send-btn {
+  width: 42px; height: 42px;
+  border-radius: 10px; background: var(--em);
+  border: none; cursor: pointer;
+  color: var(--ch3); font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background .15s;
+}
+.send-btn:active { background: var(--em2); }
+
+/* ── QUICK PILLS ── */
+.quick-pills {
+  display: flex; gap: 7px;
+  overflow-x: auto; padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+}
+.quick-pills::-webkit-scrollbar { display: none; }
+.pill {
+  padding: 7px 13px;
+  border-radius: 20px;
+  border: 1.5px solid var(--linen);
+  font-size: 11px; color: var(--moc);
+  background: var(--ivory);
+  white-space: nowrap; cursor: pointer;
+  flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.pill:active { background: var(--em5); border-color: var(--em); color: var(--em); }
+
+/* ── TASK LIST ── */
+.task-item {
+  display: flex; align-items: flex-start; gap: 11px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--ivory);
+  cursor: pointer;
+}
+.task-item:last-child { border-bottom: none; }
+.task-check {
+  width: 20px; height: 20px;
+  border-radius: 5px;
+  border: 2px solid var(--stone);
+  flex-shrink: 0; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--wh);
+  transition: all .2s;
+}
+.task-item.done .task-check { background: var(--em); border-color: var(--em); }
+.task-item.done .task-txt { text-decoration: line-through; color: var(--tau); }
+.task-txt { font-size: 13px; color: var(--wal); flex: 1; line-height: 1.4; }
+.task-meta { display: flex; gap: 6px; margin-top: 4px; align-items: center; }
+.tag {
+  font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+  letter-spacing: .04em;
+}
+.tag.crm  { background: var(--em5); color: var(--em); }
+.tag.boq  { background: var(--ch3); color: #7A5A00; }
+.tag.sm   { background: #E8EEFF; color: #2B5BB8; }
+.tag.ops  { background: var(--bg3); color: var(--bg); }
+.task-due { font-size: 10px; color: var(--tau); }
+.priority { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.priority.hi  { background: var(--bg); }
+.priority.md  { background: var(--ch); }
+.priority.lo  { background: var(--em3); }
+
+/* ── LEAD CARDS ── */
+.lead-card {
+  background: var(--wh);
+  border: 1px solid var(--linen);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 2px 8px rgba(30,24,18,.05);
+  cursor: pointer;
+  transition: transform .15s;
+  position: relative;
+  overflow: hidden;
+}
+.lead-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0;
+  width: 4px; height: 100%;
+}
+.lead-card.hot::before   { background: var(--bg); }
+.lead-card.warm::before  { background: var(--ch); }
+.lead-card.cold::before  { background: #6090CC; }
+.lead-card.new::before   { background: var(--em); }
+.lead-card:active { transform: scale(.98); }
+.lead-av {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600;
+  flex-shrink: 0;
+}
+.lead-av.hot  { background: var(--bg3); color: var(--bg); }
+.lead-av.warm { background: var(--ch3); color: #7A5A00; }
+.lead-av.cold { background: #E8EEFF; color: #2B5BB8; }
+.lead-av.new  { background: var(--em5); color: var(--em); }
+.lead-info { flex: 1; min-width: 0; }
+.lead-name { font-size: 14px; font-weight: 600; color: var(--esp); }
+.lead-proj { font-size: 11px; color: var(--tau); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lead-right { text-align: right; flex-shrink: 0; }
+.lead-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--em);
+}
+.lead-days { font-size: 10px; color: var(--tau); margin-top: 2px; }
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 9px; font-weight: 700; letter-spacing: .04em;
+  margin-top: 4px;
+}
+.badge.hot  { background: var(--bg3); color: var(--bg); }
+.badge.warm { background: var(--ch3); color: #7A5A00; }
+.badge.cold { background: #E8EEFF; color: #2B5BB8; }
+.badge.new  { background: var(--em5); color: var(--em); }
+
+/* ── BOQ PAGE ── */
+.boq-form { display: flex; flex-direction: column; gap: 12px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-group label {
+  font-size: 10px; font-weight: 700;
+  color: var(--tau); letter-spacing: .05em;
+  text-transform: uppercase;
+  display: block; margin-bottom: 5px;
+}
+.form-group select, .form-group input {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px solid var(--linen);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: var(--esp);
+  background: var(--ivory);
+  outline: none; appearance: none;
+}
+.form-group select:focus, .form-group input:focus {
+  border-color: var(--em); background: var(--wh);
+}
+.gen-btn {
+  width: 100%; padding: 14px;
+  background: var(--em); border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 600;
+  color: var(--ch3); cursor: pointer;
+  letter-spacing: .02em;
+  transition: background .15s;
+}
+.gen-btn:active { background: var(--em2); }
+
+.boq-result {
+  background: var(--ivory);
+  border-radius: 12px;
+  border: 1px solid var(--linen);
+  overflow: hidden;
+  margin-top: 14px;
+}
+.boq-result-header {
+  background: var(--em);
+  padding: 14px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.boq-result-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px; color: var(--wh);
+}
+.boq-total-badge {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600; color: var(--ch2);
+}
+.boq-line {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--linen);
+  font-size: 12px;
+}
+.boq-line:last-child { border-bottom: none; }
+.boq-line.section {
+  background: var(--em5);
+  font-size: 10px; font-weight: 700;
+  color: var(--em); letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.boq-line.total {
+  background: var(--em); color: var(--ch3);
+  font-weight: 700; font-size: 14px;
+}
+.boq-line.subtotal { background: var(--linen); font-weight: 600; }
+.boq-desc { color: var(--wal); flex: 1; }
+.boq-amt { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; color: var(--esp); white-space: nowrap; }
+
+/* ── SOCIAL PAGE ── */
+.platform-row {
+  display: flex; gap: 10px;
+  overflow-x: auto;
+  padding: 0 16px 4px;
+}
+.platform-row::-webkit-scrollbar { display: none; }
+.plat-card {
+  min-width: 100px;
+  background: var(--wh);
+  border-radius: 14px;
+  border: 1px solid var(--linen);
+  padding: 14px 12px;
+  text-align: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(30,24,18,.05);
+}
+.plat-icon { font-size: 24px; }
+.plat-name { font-size: 9px; font-weight: 700; color: var(--tau); letter-spacing: .06em; margin-top: 4px; }
+.plat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600; color: var(--em);
+}
+.plat-lbl { font-size: 9px; color: var(--tau); }
+
+.caption-out {
+  background: var(--ivory);
+  border: 1.5px solid var(--linen);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px; color: var(--wal);
+  line-height: 1.6; min-height: 80px;
+  margin-top: 12px;
+}
+.hash-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.hash { padding: 3px 10px; background: var(--em5); color: var(--em); border-radius: 20px; font-size: 10px; font-weight: 500; }
+
+.post-actions {
+  display: flex; gap: 8px; margin-top: 12px;
+}
+.post-btn {
+  flex: 1; padding: 11px;
+  border-radius: 10px; border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: opacity .15s;
+}
+.post-btn:active { opacity: .8; }
+.post-btn.em  { background: var(--em); color: var(--ch3); }
+.post-btn.bg  { background: var(--bg); color: var(--wh); }
+.post-btn.out { background: var(--ivory); color: var(--em); border: 1.5px solid var(--linen); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(var(--nav-h) + var(--safe-bot));
+  background: var(--wh);
+  border-top: 1px solid var(--linen);
+  display: flex; align-items: flex-start;
+  padding-top: 8px;
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(30,24,18,.08);
+}
+.nav-item {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  cursor: pointer;
+  padding: 4px 0;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 2px;
+  background: var(--em);
+  border-radius: 0 0 2px 2px;
+  transition: width .2s;
+}
+.nav-item.active::before { width: 28px; }
+.nav-icon-wrap {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  transition: background .2s;
+}
+.nav-item.active .nav-icon-wrap { background: var(--em5); }
+.nav-lbl {
+  font-size: 9px; font-weight: 600;
+  color: var(--tau); letter-spacing: .03em;
+  transition: color .2s;
+}
+.nav-item.active .nav-lbl { color: var(--em); }
+
+/* ── TYPING DOTS ── */
+.typing { display: flex; gap: 4px; padding: 2px 0; align-items: center; }
+.typing span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--tau);
+  animation: bounce .7s infinite ease-in-out;
+}
+.typing span:nth-child(2) { animation-delay: .13s; }
+.typing span:nth-child(3) { animation-delay: .26s; }
+@keyframes bounce {
+  0%,60%,100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
+/* ── PROGRESS ── */
+.prog-wrap { background: var(--linen); border-radius: 99px; height: 5px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; }
+.prog-fill.em  { background: var(--em); }
+.prog-fill.bg  { background: var(--bg); }
+.prog-fill.ch  { background: var(--ch2); }
+
+/* ── BRIEFING CARD ── */
+.brief-card {
+  background: var(--em);
+  border-radius: 16px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.brief-card::before {
+  content: '';
+  position: absolute; top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.brief-card::after {
+  content: '';
+  position: absolute; bottom: -20px; left: 20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: rgba(212,170,98,.08);
+}
+.brief-label {
+  font-size: 9px; font-weight: 700;
+  color: var(--ch3); letter-spacing: .07em;
+  margin-bottom: 10px;
+}
+.brief-text {
+  font-size: 13px; color: var(--wh);
+  line-height: 1.65;
+}
+.brief-text strong { color: var(--ch2); }
+
+/* ── PIPELINE PILLS ── */
+.pipe-scroll {
+  display: flex; gap: 8px;
+  overflow-x: auto; padding: 0 16px 4px;
+}
+.pipe-scroll::-webkit-scrollbar { display: none; }
+.pipe-stage {
+  min-width: 110px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  flex-shrink: 0;
+}
+.pipe-stage.inq  { background: var(--em5); }
+.pipe-stage.prop { background: var(--ch3); }
+.pipe-stage.des  { background: #E8EEFF; }
+.pipe-stage.exe  { background: var(--bg3); }
+.pipe-stage.clo  { background: #D4F0E8; }
+.pipe-stage-label {
+  font-size: 9px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.pipe-stage.inq  .pipe-stage-label { color: var(--em); }
+.pipe-stage.prop .pipe-stage-label { color: #7A5A00; }
+.pipe-stage.des  .pipe-stage-label { color: #2B5BB8; }
+.pipe-stage.exe  .pipe-stage-label { color: var(--bg); }
+.pipe-stage.clo  .pipe-stage-label { color: var(--em); }
+.pipe-count {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 600; color: var(--esp);
+}
+.pipe-val { font-size: 10px; color: var(--tau); margin-top: 2px; }
+
+/* ── FOLLOW-UP OUTPUT ── */
+.fu-out {
+  background: var(--em5);
+  border-radius: 12px;
+  border-left: 3px solid var(--em);
+  padding: 14px;
+  font-size: 12.5px; color: var(--wal);
+  line-height: 1.65; margin-top: 12px;
+  display: none;
+}
+.fu-out.show { display: block; animation: slideUp .3s ease; }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--ivory); margin: 4px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="status-bar"></div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-row">
+      <div class="header-brand">
+        <div class="brand-circle">HOI</div>
+        <div>
+          <div class="brand-name">House of Interiors</div>
+          <div class="brand-sub">AI COMMAND CENTRE</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="ai-badge"><div class="ai-dot"></div>AI ON</div>
+        <div class="notif-btn">🔔</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCROLL CONTENT -->
+  <div class="scroll-content">
+
+    <!-- ══ HOME ══ -->
+    <div class="page active" id="pg-home">
+
+      <div class="greeting-band">
+        <div class="greeting-text">Good morning,<br><em>let's get to work.</em></div>
+        <div class="greeting-sub">3 leads need follow-up · 2 tasks overdue</div>
+        <div class="greeting-strip">
+          <div class="g-chip" onclick="openAI('Draft follow-up for Sharma lead')">📧 Sharma Follow-up</div>
+          <div class="g-chip" onclick="openAI('Write Instagram caption for luxury living room project')">📸 IG Caption</div>
+          <div class="g-chip" onclick="openAI('Generate BOQ for 1200 sqft 2BHK project')">📋 Quick BOQ</div>
+          <div class="g-chip" onclick="openAI('What are my priorities for today?')">📌 Today\'s Plan</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div style="padding: 20px 0 0">
+        <div class="section-header" style="padding: 0 16px">
+          <div class="section-title">Overview</div>
+        </div>
+        <div class="stats-scroll" style="margin-top:10px">
+          <div class="stat-card em">
+            <div class="stat-icon">◈</div>
+            <div class="stat-label">Active Leads</div>
+            <div class="stat-value">24</div>
+            <div class="stat-change">↑ 4 this week</div>
+          </div>
+          <div class="stat-card bg">
+            <div class="stat-icon">₹</div>
+            <div class="stat-label">Pipeline</div>
+            <div class="stat-value">₹48L</div>
+            <div class="stat-change">↑ ₹6L this month</div>
+          </div>
+          <div class="stat-card ch">
+            <div class="stat-icon">⬡</div>
+            <div class="stat-label">Reach</div>
+            <div class="stat-value">12.4K</div>
+            <div class="stat-change">↑ 18% engagement</div>
+          </div>
+          <div class="stat-card tau">
+            <div class="stat-icon">≋</div>
+            <div class="stat-label">BOQs</div>
+            <div class="stat-value">7</div>
+            <div class="stat-change">3 pending approval</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Briefing -->
+      <div class="section">
+        <div class="brief-card">
+          <div class="brief-label">✦ AI MORNING BRIEFING</div>
+          <div class="brief-text">
+            Top priority today: <strong>Sharma follow-up call</strong> — warm lead for 3 days, ready to convert.<br><br>
+            <strong>Kapoor BOQ</strong> approval pending — send reminder.<br>
+            <strong>Social:</strong> Wednesday project post scheduled 9 AM ✓<br>
+            <strong>Pipeline:</strong> 2 deals likely to close this week.
+          </div>
+        </div>
+
+        <!-- Pipeline overview -->
+        <div class="section-header" style="margin-bottom:10px">
+          <div class="section-title">Pipeline</div>
+          <div class="section-link" onclick="showPage('crm')">Full CRM →</div>
+        </div>
+      </div>
+
+      <div class="pipe-scroll">
+        <div class="pipe-stage inq">
+          <div class="pipe-stage-label">Inquiry</div>
+          <div class="pipe-count">6</div>
+          <div class="pipe-val">₹80L+</div>
+        </div>
+        <div class="pipe-stage prop">
+          <div class="pipe-stage-label">Proposal</div>
+          <div class="pipe-count">4</div>
+          <div class="pipe-val">₹59L+</div>
+        </div>
+        <div class="pipe-stage des">
+          <div class="pipe-stage-label">Design</div>
+          <div class="pipe-count">3</div>
+          <div class="pipe-val">₹15L+</div>
+        </div>
+        <div class="pipe-stage exe">
+          <div class="pipe-stage-label">Execution</div>
+          <div class="pipe-count">5</div>
+          <div class="pipe-val">₹90L+</div>
+        </div>
+        <div class="pipe-stage clo">
+          <div class="pipe-stage-label">Closed ✓</div>
+          <div class="pipe-count">8</div>
+          <div class="pipe-val">₹2.2Cr</div>
+        </div>
+      </div>
+
+      <!-- Today's tasks -->
+      <div class="section" style="margin-top:8px">
+        <div class="section-header">
+          <div class="section-title">Today's Tasks</div>
+          <div class="section-link" onclick="showPage('tasks')">All Tasks →</div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding-top:8px;padding-bottom:8px" id="home-tasks"></div>
+        </div>
+      </div>
+
+    </div><!-- /home -->
+
+    <!-- ══ AI AGENT ══ -->
+    <div class="page" id="pg-ai">
+      <div class="section">
+        <div class="section-header" style="margin-bottom:10px">
+          <div class="section-title">✦ AI Agent</div>
+          <div class="ai-badge" style="border:1.5px solid var(--linen);background:var(--em5);color:var(--em);font-size:10px;padding:5px 10px"><div class="ai-dot" style="background:var(--em3)"></div>Active</div>
+        </div>
+        <div class="quick-pills">
+          <div class="pill" onclick="sendAI('📸 Write Instagram caption for our latest project')">📸 IG Caption</div>
+          <div class="pill" onclick="sendAI('📧 Draft follow-up email for Sharma lead')">📧 Follow-up</div>
+          <div class="pill" onclick="sendAI('📋 Generate BOQ for 3BHK 1500 sqft premium')">📋 BOQ</div>
+          <div class="pill" onclick="sendAI('💬 WhatsApp reminder for Kapoor BOQ approval')">💬 WhatsApp</div>
+          <div class="pill" onclick="sendAI('📌 What are my top priorities today?')">📌 Priorities</div>
+          <div class="pill" onclick="sendAI('💡 Give me 5 content ideas for social media this week')">💡 Content Ideas</div>
+        </div>
+        <div class="card" style="margin-top:4px">
+          <div class="card-body" style="padding-top:10px">
+            <div class="chat-wrap">
+              <div class="chat-msgs" id="ai-msgs">
+                <div class="msg ai">
+                  <div class="msg-av">AI</div>
+                  <div>
+                    <div class="msg-bub">Hi! I'm your HOI AI Agent. I can:<br><br>📸 Write social captions &amp; hashtags<br>📋 Generate BOQ estimates instantly<br>📧 Draft client follow-up emails<br>📌 Manage your daily priorities<br><br>What do you need right now?</div>
+                    <div class="msg-time">Now</div>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-row">
+                <input class="chat-in" id="ai-input" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChat()">
+                <button class="send-btn" onclick="sendChat()">↑</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capabilities -->
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Agent Performance</div></div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                  <span style="font-weight:600;color:var(--esp)">Social Media</span>
+                  <span style="color:var(--em3);font-weight:700">92%</span>
+                </div>
+                <div class="prog-wrap"><div class="prog-fill em" style="width:92%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                  <span style="font-weight:600;color:var(--esp)">BOQ Generation</span>
+                  <span style="color:var(--em3);font-weight:700">88%</span>
+                </div>
+                <div class="prog-wrap"><div class="prog-fill em" style="width:88%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                  <span style="font-weight:600;color:var(--esp)">CRM Follow-ups</span>
+                  <span style="color:var(--bg2);font-weight:700">85%</span>
+                </div>
+                <div class="prog-wrap"><div class="prog-fill bg" style="width:85%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+                  <span style="font-weight:600;color:var(--esp)">Task Management</span>
+                  <span style="color:var(--ch);font-weight:700">79%</span>
+                </div>
+                <div class="prog-wrap"><div class="prog-fill ch" style="width:79%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /ai -->
+
+    <!-- ══ CRM ══ -->
+    <div class="page" id="pg-crm">
+      <div style="background:var(--em);padding:16px 20px 20px">
+        <div style="font-size:12px;color:var(--ch3);margin-bottom:6px;font-weight:600;letter-spacing:.04em">LEAD TRACKER</div>
+        <div style="display:flex;gap:16px">
+          <div><div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--wh);font-weight:600">24</div><div style="font-size:10px;color:var(--ch3)">Total Leads</div></div>
+          <div style="width:1px;background:rgba(255,255,255,.15)"></div>
+          <div><div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--ch2);font-weight:600">₹48L</div><div style="font-size:10px;color:var(--ch3)">Pipeline</div></div>
+          <div style="width:1px;background:rgba(255,255,255,.15)"></div>
+          <div><div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--wh);font-weight:600">34%</div><div style="font-size:10px;color:var(--ch3)">Conversion</div></div>
+        </div>
+        <div style="height:2px;background:linear-gradient(90deg,var(--ch),var(--ch2));border-radius:2px;margin-top:14px"></div>
+      </div>
+
+      <div class="section" style="padding-top:16px">
+        <div class="section-header">
+          <div class="section-title">All Leads</div>
+          <button class="gen-btn" style="width:auto;padding:8px 16px;font-size:12px">+ Add Lead</button>
+        </div>
+
+        <div id="leads-list">
+          <!-- leads rendered by JS -->
+        </div>
+
+        <!-- AI Follow-up section -->
+        <div class="section-header" style="margin-top:8px">
+          <div class="section-title">AI Follow-up Draft</div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:12px;color:var(--tau);margin-bottom:10px" id="fu-label">Tap "Draft →" on any lead above</div>
+            <div class="fu-out" id="fu-out"></div>
+            <div id="fu-actions" style="display:none;margin-top:12px">
+              <div class="post-actions">
+                <button class="post-btn em">📧 Email</button>
+                <button class="post-btn bg">💬 WhatsApp</button>
+                <button class="post-btn out">📋 Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /crm -->
+
+    <!-- ══ BOQ ══ -->
+    <div class="page" id="pg-boq">
+      <div style="background:var(--em);padding:16px 20px 20px">
+        <div style="font-size:12px;color:var(--ch3);margin-bottom:4px;font-weight:600;letter-spacing:.04em">BOQ BUILDER</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--wh)">AI-Powered Estimates</div>
+        <div style="height:2px;background:linear-gradient(90deg,var(--ch),var(--ch2));border-radius:2px;margin-top:14px"></div>
+      </div>
+
+      <div class="section" style="padding-top:16px">
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Generate BOQ</div><div class="card-sub">Fill details and get instant estimate</div></div>
+          </div>
+          <div class="card-body">
+            <div class="boq-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Project Type</label>
+                  <select id="b-type">
+                    <option>2BHK Full Interior</option>
+                    <option>3BHK Full Interior</option>
+                    <option>4BHK / Villa</option>
+                    <option>Modular Kitchen</option>
+                    <option>Office Interior</option>
+                    <option>Commercial / Retail</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Area (sqft)</label>
+                  <input id="b-area" type="number" placeholder="e.g. 1200">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Quality Tier</label>
+                  <select id="b-tier">
+                    <option>Premium</option>
+                    <option>Luxury</option>
+                    <option>Ultra Luxury</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Client Name</label>
+                  <input id="b-client" type="text" placeholder="Mr. Sharma">
+                </div>
+              </div>
+              <button class="gen-btn" onclick="genBOQ()">✦ Generate BOQ</button>
+            </div>
+            <div id="boq-out"></div>
+          </div>
+        </div>
+
+        <!-- Saved BOQs -->
+        <div class="section-header">
+          <div class="section-title">Saved BOQs</div>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding:0">
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--ivory)">
+                <div><div style="font-size:13px;font-weight:600;color:var(--esp)">Kapoor — Modular Kitchen</div><div style="font-size:10px;color:var(--tau);margin-top:2px">Created 2 days ago</div></div>
+                <div style="text-align:right"><div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--em);font-weight:600">₹4.8L</div><span class="badge warm">Pending</span></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--ivory)">
+                <div><div style="font-size:13px;font-weight:600;color:var(--esp)">Mehta — 2BHK Full Interior</div><div style="font-size:10px;color:var(--tau);margin-top:2px">Created 4 days ago</div></div>
+                <div style="text-align:right"><div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--em);font-weight:600">₹9.2L</div><span class="badge hot">Review</span></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--ivory)">
+                <div><div style="font-size:13px;font-weight:600;color:var(--esp)">Arora — 3BHK Turnkey</div><div style="font-size:10px;color:var(--tau);margin-top:2px">Created 2 weeks ago</div></div>
+                <div style="text-align:right"><div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--em);font-weight:600">₹28L</div><span class="badge new">Approved ✓</span></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px">
+                <div><div style="font-size:13px;font-weight:600;color:var(--esp)">Gupta — Villa Interior</div><div style="font-size:10px;color:var(--tau);margin-top:2px">Created 1 week ago</div></div>
+                <div style="text-align:right"><div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--em);font-weight:600">₹54L</div><span class="badge cold">Draft</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /boq -->
+
+    <!-- ══ SOCIAL ══ -->
+    <div class="page" id="pg-social">
+      <div style="background:var(--em);padding:16px 20px 20px">
+        <div style="font-size:12px;color:var(--ch3);margin-bottom:4px;font-weight:600;letter-spacing:.04em">SOCIAL MEDIA</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--wh)">Content & Marketing</div>
+        <div style="height:2px;background:linear-gradient(90deg,var(--ch),var(--ch2));border-radius:2px;margin-top:14px"></div>
+      </div>
+
+      <!-- Platform stats -->
+      <div style="padding:16px 0 0">
+        <div style="padding:0 16px;margin-bottom:10px">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--esp)">Platforms</div>
+        </div>
+        <div class="platform-row">
+          <div class="plat-card">
+            <div class="plat-icon">📸</div>
+            <div class="plat-name">INSTAGRAM</div>
+            <div class="plat-val">8.4K</div>
+            <div class="plat-lbl">followers</div>
+          </div>
+          <div class="plat-card">
+            <div class="plat-icon">💼</div>
+            <div class="plat-name">FACEBOOK</div>
+            <div class="plat-val">3.2K</div>
+            <div class="plat-lbl">followers</div>
+          </div>
+          <div class="plat-card">
+            <div class="plat-icon">🔗</div>
+            <div class="plat-name">LINKEDIN</div>
+            <div class="plat-val">780</div>
+            <div class="plat-lbl">connections</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:16px">
+        <!-- Caption Generator -->
+        <div class="section-header">
+          <div class="section-title">AI Caption Generator</div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:10px">
+              <div class="form-group">
+                <label>Platform</label>
+                <select id="s-plat">
+                  <option>Instagram</option>
+                  <option>Facebook</option>
+                  <option>LinkedIn</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Post Type</label>
+                <select id="s-type">
+                  <option>Project Showcase</option>
+                  <option>Design Tip</option>
+                  <option>Before & After</option>
+                  <option>Testimonial</option>
+                  <option>Offer/Promotion</option>
+                </select>
+              </div>
+            </div>
+            <input id="s-ctx" style="width:100%;padding:11px 13px;border:1.5px solid var(--linen);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--esp);background:var(--ivory);outline:none;margin-bottom:10px" placeholder="Describe your project briefly...">
+            <button class="gen-btn" onclick="genCaption()">✦ Generate Caption + Hashtags</button>
+            <div id="cap-out"></div>
+            <div id="cap-actions" style="display:none">
+              <div class="post-actions" style="margin-top:10px">
+                <button class="post-btn em">📅 Schedule</button>
+                <button class="post-btn bg">📤 Post Now</button>
+                <button class="post-btn out">🔄 Redo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content Ideas -->
+        <div class="section-header">
+          <div class="section-title">This Week's Ideas</div>
+          <div class="section-link">🔄 Refresh</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+          <div style="padding:13px 16px;background:var(--em5);border-radius:12px;border-left:3px solid var(--em)"><div style="font-size:9px;font-weight:700;color:var(--em);letter-spacing:.05em;margin-bottom:4px">📸 INSTAGRAM REEL</div><div style="font-size:12px;color:var(--wal)">"3 lighting tricks that make any room look bigger" — transformation reel</div></div>
+          <div style="padding:13px 16px;background:var(--ch3);border-radius:12px;border-left:3px solid var(--ch)"><div style="font-size:9px;font-weight:700;color:#7A5A00;letter-spacing:.05em;margin-bottom:4px">💼 LINKEDIN POST</div><div style="font-size:12px;color:var(--wal)">Case study: 1200sqft apartment transformed into luxury home in 18 weeks</div></div>
+          <div style="padding:13px 16px;background:var(--bg3);border-radius:12px;border-left:3px solid var(--bg)"><div style="font-size:9px;font-weight:700;color:var(--bg);letter-spacing:.05em;margin-bottom:4px">📘 FACEBOOK</div><div style="font-size:12px;color:var(--wal)">"5 questions to ask your interior designer" — educational post</div></div>
+          <div style="padding:13px 16px;background:var(--em5);border-radius:12px;border-left:3px solid var(--em3)"><div style="font-size:9px;font-weight:700;color:var(--em);letter-spacing:.05em;margin-bottom:4px">🎥 INSTAGRAM STORY</div><div style="font-size:12px;color:var(--wal)">Time-lapse: Elara Hotel installation — satisfying transformation</div></div>
+        </div>
+      </div>
+    </div><!-- /social -->
+
+    <!-- ══ TASKS ══ -->
+    <div class="page" id="pg-tasks">
+      <div style="background:var(--em);padding:16px 20px 20px">
+        <div style="font-size:12px;color:var(--ch3);margin-bottom:4px;font-weight:600;letter-spacing:.04em">OFFICE TASKS</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--wh)">Daily Task Manager</div>
+        <div style="height:2px;background:linear-gradient(90deg,var(--ch),var(--ch2));border-radius:2px;margin-top:14px"></div>
+      </div>
+
+      <div class="section" style="padding-top:16px">
+        <!-- Progress -->
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-body" style="padding:14px 16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:600;color:var(--esp)">This Week</div>
+              <div style="font-size:13px;font-weight:700;color:var(--em)">14 / 18 done</div>
+            </div>
+            <div class="prog-wrap" style="height:8px"><div class="prog-fill em" style="width:78%"></div></div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">All Tasks</div>
+          <button class="gen-btn" onclick="addTaskMobile()" style="width:auto;padding:8px 16px;font-size:12px">+ Add</button>
+        </div>
+        <div class="card">
+          <div class="card-body" style="padding-top:4px;padding-bottom:4px" id="full-tasks">
+          </div>
+        </div>
+      </div>
+    </div><!-- /tasks -->
+
+  </div><!-- /scroll -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('home')">
+      <div class="nav-icon-wrap">⊞</div>
+      <div class="nav-lbl">Home</div>
+    </div>
+    <div class="nav-item" onclick="showPage('ai')">
+      <div class="nav-icon-wrap">✦</div>
+      <div class="nav-lbl">AI Agent</div>
+    </div>
+    <div class="nav-item" onclick="showPage('crm')">
+      <div class="nav-icon-wrap">◈</div>
+      <div class="nav-lbl">CRM</div>
+    </div>
+    <div class="nav-item" onclick="showPage('boq')">
+      <div class="nav-icon-wrap">≋</div>
+      <div class="nav-lbl">BOQ</div>
+    </div>
+    <div class="nav-item" onclick="showPage('social')">
+      <div class="nav-icon-wrap">⬡</div>
+      <div class="nav-lbl">Social</div>
+    </div>
+    <div class="nav-item" onclick="showPage('tasks')">
+      <div class="nav-icon-wrap">◻</div>
+      <div class="nav-lbl">Tasks</div>
+    </div>
+  </nav>
+</div>
+
+<script>
+// ── NAVIGATION ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('pg-' + id);
+  if (pg) pg.classList.add('active');
+  const nav = document.querySelector(`.nav-item[onclick="showPage('${id}')"]`);
+  if (nav) nav.classList.add('active');
+  document.querySelector('.scroll-content').scrollTop = 0;
+}
+
+// ── TASKS ──
+const tasks = [
+  { txt:'Call Sharma — 3BHK site visit follow-up',    tag:'crm', due:'11 AM',   pri:'hi',  done:false },
+  { txt:'Send Kapoor BOQ v2',                          tag:'boq', due:'1 PM',    pri:'hi',  done:false },
+  { txt:'Post Monday design tip on Instagram',         tag:'sm',  due:'Done',    pri:'lo',  done:true  },
+  { txt:'Update Arora project timeline — Week 6',      tag:'ops', due:'5 PM',    pri:'md',  done:false },
+  { txt:'Reply to 4 DMs — Instagram inquiries',        tag:'sm',  due:'3 PM',    pri:'md',  done:false },
+  { txt:'Review Elara Hotel BOQ revision',             tag:'boq', due:'Tomorrow',pri:'lo',  done:false },
+  { txt:'Draft LinkedIn post — project showcase',      tag:'sm',  due:'Tomorrow',pri:'lo',  done:false },
+  { txt:'Follow-up Mehta — site visit confirm',        tag:'crm', due:'Tomorrow',pri:'md',  done:false },
+];
+const tagN = { crm:'CRM', boq:'BOQ', sm:'Social', ops:'Ops' };
+
+function renderTasksEl(elId, limit=99) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = tasks.slice(0,limit).map((t,i) => `
+    <div class="task-item ${t.done?'done':''}" onclick="toggleT(${i},'${elId}')">
+      <div class="priority ${t.pri}"></div>
+      <div class="task-check">${t.done?'✓':''}</div>
+      <div style="flex:1">
+        <div class="task-txt">${t.txt}</div>
+        <div class="task-meta">
+          <span class="tag ${t.tag}">${tagN[t.tag]}</span>
+          <span class="task-due">${t.due}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleT(i, elId) {
+  tasks[i].done = !tasks[i].done;
+  renderTasksEl('home-tasks', 4);
+  renderTasksEl('full-tasks');
+}
+
+function addTaskMobile() {
+  const txt = prompt('New task:');
+  if (txt) { tasks.unshift({ txt, tag:'ops', due:'Today', pri:'md', done:false }); renderTasksEl('full-tasks'); }
+}
+
+// ── AI CHAT ──
+const aiReply = (m) => {
+  const ml = m.toLowerCase();
+  if (ml.includes('caption') || ml.includes('instagram') || ml.includes('social') || ml.includes('post'))
+    return '📸 Here\'s your Instagram caption:\n\n"Where every corner tells a story of refined living. Step inside our latest transformation — where modern luxury meets timeless elegance. Swipe to see the full reveal. 🏡✨"\n\n#HouseOfInteriors #LuxuryInteriors #InteriorDesignNoida #ModernLiving #HomeMakeover #PremiumInteriors #DreamHome';
+  if (ml.includes('boq') || ml.includes('estimate') || ml.includes('sqft'))
+    return '📋 I\'ll generate a full BOQ for you. Head to the BOQ tab and fill in the project details — I\'ll produce a complete line-item estimate with civil, furniture, electrical, painting and GST in seconds.';
+  if (ml.includes('follow') || ml.includes('email') || ml.includes('whatsapp') || ml.includes('sharma'))
+    return '📧 Follow-up draft for Sharma:\n\n"Dear Mr. Sharma,\n\nThank you for your interest in House of Interiors for your 3BHK project. I wanted to follow up from our conversation and share that we\'d love to arrange a complimentary site visit at your convenience.\n\nShall we schedule this week? I\'ll ensure our senior designer is present to personally discuss your vision.\n\nWarm regards,\nHouse of Interiors\n+91 97175 40052"';
+  if (ml.includes('priorit') || ml.includes('today') || ml.includes('task'))
+    return '📌 Your priorities for today:\n\n🔴 HIGH: Sharma follow-up call (11 AM)\n🔴 HIGH: Kapoor BOQ approval reminder (1 PM)\n🟡 MED: Reply to Instagram DMs (3 PM)\n🟡 MED: Arora timeline update (5 PM)\n🟢 LOW: Draft LinkedIn post';
+  if (ml.includes('content') || ml.includes('idea'))
+    return '💡 5 content ideas for this week:\n\n1. 📸 Before/after reel — Arora residence transformation\n2. 💡 "3 lighting tricks" design tip carousel\n3. ⭐ Kapoor family testimonial + project photos\n4. 🏗 Behind-the-scenes: Elara Hotel installation\n5. 📚 "5 questions to ask your interior designer"';
+  return ['Great! I\'m on it. Based on HOI\'s brand and your recent projects, here\'s what I suggest — feel free to personalise it before sending.',
+    'Understood! Let me help you with that right now. This is exactly the kind of task I can handle efficiently for you.',
+    'On it! I\'ve checked your current pipeline and here\'s the most strategic approach for House of Interiors.'
+  ][Math.floor(Math.random()*3)];
+};
+
+function sendChat() {
+  const inp = document.getElementById('ai-input');
+  const chat = document.getElementById('ai-msgs');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  chat.innerHTML += `<div class="msg user"><div class="msg-av">You</div><div><div class="msg-bub">${msg}</div><div class="msg-time">Now</div></div></div>`;
+  inp.value = '';
+  const tid = 'ty' + Date.now();
+  chat.innerHTML += `<div class="msg ai" id="${tid}"><div class="msg-av">AI</div><div><div class="msg-bub"><div class="typing"><span></span><span></span><span></span></div></div></div></div>`;
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(() => {
+    const el = document.getElementById(tid);
+    if (el) { el.outerHTML = `<div class="msg ai"><div class="msg-av">AI</div><div><div class="msg-bub" style="white-space:pre-line">${aiReply(msg)}</div><div class="msg-time">Just now</div></div></div>`; chat.scrollTop = chat.scrollHeight; }
+  }, 1100);
+}
+
+function sendAI(msg) {
+  document.getElementById('ai-input').value = msg;
+  sendChat();
+}
+
+function openAI(msg) {
+  showPage('ai');
+  setTimeout(() => { document.getElementById('ai-input').value = msg; sendChat(); }, 200);
+}
+
+// ── LEADS ──
+const leads = [
+  { name:'Rakesh Sharma', proj:'3BHK Full Interior · Noida', src:'Instagram', val:'₹14L', status:'hot',  days:'3 days ago' },
+  { name:'Priya Mehta',   proj:'2BHK Kitchen + Wardrobe',    src:'Referral',  val:'₹8L',  status:'warm', days:'1 day ago' },
+  { name:'TechSpace',     proj:'2000sqft Office Interior',    src:'Website',   val:'₹22L', status:'hot',  days:'Today' },
+  { name:'Vijay Kapoor',  proj:'Modular Kitchen',             src:'Walk-in',   val:'₹4.5L',status:'new',  days:'Today' },
+  { name:'Anjali Singh',  proj:'4BHK Turnkey · Gr. Noida',   src:'Google Ads',val:'₹38L', status:'warm', days:'5 days ago' },
+  { name:'Rohan Gupta',   proj:'Villa Interior · Sector 44',  src:'Instagram', val:'₹55L', status:'hot',  days:'2 days ago' },
+];
+const badgeLabel = { hot:'🔥 Hot', warm:'⚡ Warm', cold:'❄ Cold', new:'● New' };
+
+function renderLeads() {
+  const el = document.getElementById('leads-list');
+  if (!el) return;
+  el.innerHTML = leads.map((l,i) => `
+    <div class="lead-card ${l.status}">
+      <div class="lead-av ${l.status}">${l.name[0]}</div>
+      <div class="lead-info">
+        <div class="lead-name">${l.name}</div>
+        <div class="lead-proj">${l.proj}</div>
+        <div style="margin-top:5px"><span class="badge ${l.status}">${badgeLabel[l.status]}</span></div>
+      </div>
+      <div class="lead-right">
+        <div class="lead-val">${l.val}</div>
+        <div class="lead-days">${l.days}</div>
+        <div style="margin-top:6px;font-size:11px;font-weight:600;color:var(--em);cursor:pointer" onclick="draftFU('${l.name}','${l.proj}','${l.val}')">Draft →</div>
+      </div>
+    </div>`).join('');
+}
+
+function draftFU(name, proj, val) {
+  const out = document.getElementById('fu-out');
+  const lbl = document.getElementById('fu-label');
+  lbl.textContent = `Drafting for: ${name}`;
+  out.classList.remove('show');
+  out.innerHTML = '<div class="typing" style="padding:14px 0"><span></span><span></span><span></span></div>';
+  out.classList.add('show');
+  document.getElementById('fu-actions').style.display = 'none';
+  setTimeout(() => {
+    out.innerHTML = `<div style="font-size:10px;font-weight:700;color:var(--em);letter-spacing:.05em;margin-bottom:10px">✦ AI FOLLOW-UP DRAFTED</div>
+      <div style="font-size:13px;color:var(--wal);line-height:1.65">Dear Mr./Ms. ${name},<br><br>
+      Thank you for your interest in House of Interiors for your <strong>${proj}</strong> project.<br><br>
+      We'd love to arrange a complimentary 45-minute design consultation at your site — this will help us understand your vision and present personalised concepts within your budget of <strong>${val}</strong>.<br><br>
+      Could we connect this week? Please suggest your preferred time and I'll arrange everything accordingly.<br><br>
+      Warm regards,<br><strong>House of Interiors</strong><br>+91 97175 40052</div>`;
+    document.getElementById('fu-actions').style.display = 'block';
+    document.getElementById('fu-out').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }, 1000);
+}
+
+// ── BOQ ──
+function genBOQ() {
+  const type   = document.getElementById('b-type').value;
+  const area   = parseInt(document.getElementById('b-area').value) || 1200;
+  const tier   = document.getElementById('b-tier').value;
+  const client = document.getElementById('b-client').value || 'Client';
+  const rateMap = { 'Premium':2200, 'Luxury':3000, 'Ultra Luxury':4200 };
+  const r = rateMap[tier] || 2200;
+
+  const sections = [
+    { name:'CIVIL & STRUCTURE', items:[
+      ['False ceiling — gypsum', Math.round(area*.85 * (tier==='Premium'?130:tier==='Luxury'?160:200))],
+      ['Demolition & clearing', Math.round(area*28)],
+    ]},
+    { name:'FLOORING', items:[
+      ['Vitrified / marble flooring', Math.round(area*.9 * (tier==='Premium'?200:tier==='Luxury'?300:420))],
+      ['Dado / skirting', Math.round(area*.6*95)],
+    ]},
+    { name:'MODULAR FURNITURE', items:[
+      ['Modular kitchen', Math.round(area*.012*(tier==='Premium'?2800:tier==='Luxury'?3600:4800))],
+      ['Wardrobes — all rooms', Math.round(area*.025*(tier==='Premium'?2200:tier==='Luxury'?2800:3800))],
+      ['TV unit + study unit', Math.round(area*18)],
+    ]},
+    { name:'ELECTRICAL & LIGHTING', items:[
+      ['Internal wiring', Math.round(area*.12*850)],
+      ['Light fixtures', Math.round(area*.08*(tier==='Premium'?1600:tier==='Luxury'?2400:3200))],
+    ]},
+    { name:'PAINTING & FINISHES', items:[
+      ['Premium emulsion — all rooms', Math.round(area*2.8*(tier==='Premium'?40:tier==='Luxury'?55:72))],
+      ['Feature wall / texture', Math.round(area*.25*185)],
+    ]},
+    { name:'DESIGN FEES', items:[
+      ['Interior design fee', Math.round(area*r*.08)],
+      ['Project management', Math.round(area*r*.05)],
+    ]},
+  ];
+
+  let sub = 0;
+  let html = '<div class="boq-result">';
+  html += `<div class="boq-result-header"><div class="boq-result-title">${client} · ${type}</div><div style="font-size:10px;color:var(--ch3)">${area} sqft · ${tier}</div></div>`;
+
+  sections.forEach(s => {
+    html += `<div class="boq-line section"><span class="boq-desc">${s.name}</span></div>`;
+    s.items.forEach(([desc, amt]) => {
+      sub += amt;
+      html += `<div class="boq-line"><span class="boq-desc">${desc}</span><span class="boq-amt">₹${amt.toLocaleString()}</span></div>`;
+    });
+  });
+
+  const gst   = Math.round(sub*.18);
+  const total = sub + gst;
+
+  html += `<div class="boq-line subtotal"><span class="boq-desc" style="font-weight:700">Sub-Total</span><span class="boq-amt" style="font-weight:700">₹${sub.toLocaleString()}</span></div>`;
+  html += `<div class="boq-line subtotal"><span class="boq-desc" style="font-weight:700">GST @ 18%</span><span class="boq-amt" style="font-weight:700">₹${gst.toLocaleString()}</span></div>`;
+  html += `<div class="boq-line total"><span class="boq-desc">TOTAL (INCL. GST)</span><span class="boq-amt" style="font-size:16px;color:var(--ch2)">₹${total.toLocaleString()}</span></div>`;
+  html += '</div>';
+  html += `<div class="post-actions" style="margin-top:12px">
+    <button class="post-btn em">⬇ Download</button>
+    <button class="post-btn bg">📧 Email</button>
+    <button class="post-btn out">📋 Copy</button>
+  </div>`;
+
+  document.getElementById('boq-out').innerHTML = html;
+  document.getElementById('boq-out').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── CAPTION ──
+function genCaption() {
+  const plat = document.getElementById('s-plat').value;
+  const type = document.getElementById('s-type').value;
+  const ctx  = document.getElementById('s-ctx').value || 'luxury interior project';
+  document.getElementById('cap-out').innerHTML = '<div class="caption-out"><div class="typing"><span></span><span></span><span></span></div></div>';
+  document.getElementById('cap-actions').style.display = 'none';
+
+  const caps = {
+    'Project Showcase': `✨ Every corner crafted with intention.\n\nThis ${ctx} is a testament to what happens when design meets devotion. From the warm textures to the thoughtful lighting — every element curated to feel both luxurious and utterly liveable.\n\nYour dream home starts here. 🏡`,
+    'Design Tip': `💡 Design secret: Luxury isn't about spending more — it's choosing with intention.\n\nFor your ${ctx}, the key is layering: start with timeless foundations, add warmth through textiles, let one statement piece do the talking.`,
+    'Before & After': `The transformation that changed everything. 🔄\n\nFrom a dated space to this stunning ${ctx} — the difference is in the details, the discipline, and the design vision.\n\nReady to transform yours? DM us ✨`,
+    'Testimonial': `⭐️⭐️⭐️⭐️⭐️ "House of Interiors didn't just design our space — they designed our lifestyle."\n\nThank you for trusting us with your vision. 🙏`,
+    'Offer/Promotion': `🎁 Special Offer — This Month!\n\nBook your ${ctx} project and receive:\n✔ Free 3D visualisation (₹15,000 value)\n✔ Complimentary colour consultation\n✔ 10% off modular furniture\n\nLimited slots. DM to claim! ⏰`,
+  };
+
+  const tags = plat==='LinkedIn'
+    ? ['#InteriorDesign','#LuxuryInteriors','#HouseOfInteriors','#Architecture','#HomeDecor']
+    : ['#HouseOfInteriors','#LuxuryInteriors','#InteriorDesignNoida','#PremiumInteriors','#HomeMakeover','#DreamHome','#ModernLiving','#InteriorLovers','#NoidaInteriors'];
+
+  setTimeout(() => {
+    const cap = caps[type] || caps['Project Showcase'];
+    document.getElementById('cap-out').innerHTML = `
+      <div class="caption-out">${cap.replace(/\n/g,'<br>')}</div>
+      <div class="hash-row">${tags.map(h=>`<span class="hash">${h}</span>`).join('')}</div>`;
+    document.getElementById('cap-actions').style.display = 'block';
+  }, 900);
+}
+
+// ── INIT ──
+renderTasksEl('home-tasks', 4);
+renderTasksEl('full-tasks');
+renderLeads();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(() => {
+      console.log('HOI PWA ready');
+    });
+  });
+}
+</script>
+</body>
+</html>
