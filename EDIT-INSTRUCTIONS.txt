@@ -1,0 +1,12 @@
+DELIVERY VERSION
+
+This package is optimized to DISPLAY correctly.
+The gallery and comparison images are embedded directly into index.html so they should no longer appear missing.
+
+If you want a fully asset-linked editable version after this, ask for:
+"make me the asset-linked editable version from this working file"
+
+Current updates:
+- all local gallery/comparison images embedded into HTML
+- 350+ changed to 34
+- 10+ changed to 5+

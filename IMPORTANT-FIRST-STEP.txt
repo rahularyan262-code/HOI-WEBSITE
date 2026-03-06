@@ -1,0 +1,13 @@
+IMPORTANT
+
+This version has the gallery and comparison images embedded directly into index.html.
+That means:
+- images should display even when local file paths fail
+- easier offline preview
+- safer for local browser testing
+
+Stats updated in this version:
+- 5+ Years of Excellence
+- 34 Projects Completed
+
+Open index.html from this extracted folder.
